@@ -16,7 +16,6 @@ using namespace std::chrono;
 using namespace moodycamel;
 
 
-
 high_resolution_clock::time_point start;
 
 atomic_int index(0);
@@ -34,12 +33,10 @@ int map_thread_to_cpu(int core_id)
         return -1;
    }
 
-
    cpu_set_t cpuset;
    CPU_ZERO(&cpuset);
    CPU_SET(core_id, &cpuset);
    pthread_t current_thread = pthread_self();
-
 
    return pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
 }
@@ -50,13 +47,9 @@ void produce()
     while(1)
     {
         start = high_resolution_clock::now();
-
         //blocking_queue.enqueue(high_resolution_clock::now());
 
         index++;
-
-
-
         usleep(1000000);
     }
 }
@@ -93,7 +86,6 @@ void consume2()
         //blocking_queue.wait_dequeue(start);
         if (my_index != index)
         {
-
             msg = "consumer2: " + to_string(duration_cast<nanoseconds>(high_resolution_clock::now() - start).count());
 
             log_queue.enqueue(msg);
@@ -106,7 +98,6 @@ void logging()
 {
     string msg;
     map_thread_to_cpu(3);
-
 
     while(1)
     {

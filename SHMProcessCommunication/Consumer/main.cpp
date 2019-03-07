@@ -58,12 +58,10 @@ int map_thread_to_cpu(int core_id)
         return -1;
    }
 
-
    cpu_set_t cpuset;
    CPU_ZERO(&cpuset);
    CPU_SET(core_id, &cpuset);
    pthread_t current_thread = pthread_self();
-
 
    return pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
 }
@@ -77,7 +75,7 @@ void read_message(const packet& msg)
     //log_queue.enqueue(msg);
 }
 
-/*void logging()
+/*void logging() //logging packets directly
 {
     map_thread_to_cpu(0);
 
@@ -87,8 +85,6 @@ void read_message(const packet& msg)
     int max = 0;
 
     string text;
-
-
 
     while(1)
     {
@@ -110,11 +106,10 @@ void read_message(const packet& msg)
     }
 }*/
 
-void logging()
+void logging() //simple logging only strings
 {
     string msg;
     map_thread_to_cpu(0);
-
 
     while(1)
     {
@@ -125,8 +120,6 @@ void logging()
 
 int main()
 {
-    cout << " packet "<< sizeof(packet) << endl;
-
     map_thread_to_cpu(2);
 
     thread log = thread(&logging);
@@ -153,12 +146,11 @@ int main()
 
     while(1)
     {
-
         if (local_index != *last)
         {
-
             do
             {
+
                 if (local_index + 1 >= BUFFER_SIZE){
                     local_index = 0;
                 }
@@ -169,12 +161,10 @@ int main()
                 read_message(buffer[local_index]);
 
             }while(local_index != *last);
-
         }
     }//while
 
 
     shmdt(buffer); //detach buf from shared memory
     //shmctl(shmid_buffer, IPC_RMID, NULL); //destroy shared memory
-
 }
