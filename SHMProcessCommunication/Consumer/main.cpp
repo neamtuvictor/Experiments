@@ -41,7 +41,6 @@ BlockingConcurrentQueue<string> log_queue;
     while(!__sync_bool_compare_and_swap(lock, 0, 1))
     {
         sched_yield();
-
     }
 }
 

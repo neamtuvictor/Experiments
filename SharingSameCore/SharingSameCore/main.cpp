@@ -15,6 +15,8 @@ using namespace std;
 using namespace std::chrono;
 using namespace moodycamel;
 
+#define LIKELY(condition) __builtin_expect(static_cast<bool>(condition), 1)
+#define UNLIKELY(condition) __builtin_expect(static_cast<bool>(condition), 0)
 
 high_resolution_clock::time_point start;
 
@@ -27,7 +29,6 @@ ConcurrentQueue<high_resolution_clock::time_point> nonblocking_queue;
 
 int map_thread_to_cpu(int core_id)
 {
-
    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
    if (core_id < 0 || core_id >= num_cores) {
         return -1;
@@ -50,7 +51,8 @@ void produce()
         //blocking_queue.enqueue(high_resolution_clock::now());
 
         index++;
-        usleep(1000000);
+        //usleep(1);
+        sleep(1);
     }
 }
 
@@ -63,7 +65,7 @@ void consume1()
     while(1)
     {
         //blocking_queue.wait_dequeue(start);
-        if (my_index != index)
+        if (LIKELY(my_index != index))
         {
 
             msg = "consumer1: " + to_string(duration_cast<nanoseconds>(high_resolution_clock::now() - start).count());
@@ -80,11 +82,11 @@ void consume2()
     int my_index;
     string msg;
 
-    map_thread_to_cpu(2);
+    map_thread_to_cpu(3);
     while(1)
     {
         //blocking_queue.wait_dequeue(start);
-        if (my_index != index)
+        if (LIKELY(my_index != index))
         {
             msg = "consumer2: " + to_string(duration_cast<nanoseconds>(high_resolution_clock::now() - start).count());
 

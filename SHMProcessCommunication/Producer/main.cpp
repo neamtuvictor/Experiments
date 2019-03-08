@@ -69,15 +69,14 @@ int main()
        {
 
             message = "msg[" + to_string(i) + "]: ";
-
             strcpy(buffer[i].str, message.c_str());
             buffer[i].tp = high_resolution_clock::now();
 
             *last = i;
 
 
-            //sleep(1);
-            usleep(1);
+            sleep(60);
+            //usleep(1);
        }
    }
 
